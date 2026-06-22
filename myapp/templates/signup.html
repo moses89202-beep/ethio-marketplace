@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign up{% endblock %}
+
+{% block content %}
+<div class="w-1/2 p-6 my-6 mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm">
+    <h1 class="mb-8 text-3xl font-bold text-gray-800 text-center">Create an Account</h1>
+    
+    <form method="post" action=".">
+        {% csrf_token %}
+        
+        {% if form.errors or form.non_field_errors %}
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+                {% for field in form %}
+                    {% if field.errors %}
+                        <p class="font-semibold">{{ field.label }}:</p>
+                        {{ field.errors }}
+                    {% endif %}
+                {% endfor %}
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="mb-5">
+            <label class="block mb-2 text-sm font-medium text-gray-700">Username</label>
+            <div class="django-form-field">
+                {{ form.username }}
+            </div>
+        </div>
+        
+        <div class="mb-5">
+            <label class="block mb-2 text-sm font-medium text-gray-700">Email Address</label>
+            <div class="django-form-field">
+                {{ form.email }}
+            </div>
+        </div>
+        
+        <div class="mb-5">
+            <label class="block mb-2 text-sm font-medium text-gray-700">Password</label>
+            <div class="django-form-field">
+                <div id="password-input-wrapper">
+                    {{ form.password1 }}
+                </div>
+            </div>
+            
+            <div class="mt-2 hidden" id="strength-container">
+                <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                    <div id="strength-bar" class="h-full w-0 transition-all duration-300 ease-out"></div>
+                </div>
+                <p id="strength-text" class="text-xs mt-1 font-medium text-gray-500"></p>
+            </div>
+        </div>
+        
+        <div class="mb-6">
+            <label class="block mb-2 text-sm font-medium text-gray-700">Confirm Password</label>
+            <div class="django-form-field">
+                {{ form.password2 }}
+            </div>
+        </div>
+
+        <button class="w-full py-4 px-8 text-lg font-semibold bg-teal-500 hover:bg-teal-600 active:bg-teal-700 rounded-xl text-white transition-colors duration-200 shadow-md shadow-teal-100 mt-2">
+            Sign Up
+        </button>
+    </form>
+</div>
+
+<style>
+    .django-form-field input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        background-color: #f9fafb;
+        border: 1px solid #d1d5db;
+        border-radius: 0.75rem;
+        outline: none;
+        transition: all 0.2s ease-in-out;
+    }
+    .django-form-field input:focus {
+        background-color: #ffffff;
+        border-color: #14b8a6;
+        box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.15);
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const passwordInput = document.querySelector("#password-input-wrapper input");
+        const container = document.getElementById("strength-container");
+        const bar = document.getElementById("strength-bar");
+        const text = document.getElementById("strength-text");
+
+        if (passwordInput) {
+            passwordInput.addEventListener("input", function() {
+                const val = passwordInput.value;
+                if (val.length === 0) {
+                    container.classList.add("hidden");
+                    return;
+                }
+                
+                container.classList.remove("hidden");
+                let score = 0;
+
+                if (val.length >= 8) score++;
+                if (/[A-Z]/.test(val)) score++;
+                if (/[0-9]/.test(val)) score++;
+                if (/[^A-Za-z0-9]/.test(val)) score++;
+
+
+                if (score <= 1) {
+                    bar.style.width = "25%";
+                    bar.className = "h-full bg-red-500 transition-all duration-300";
+                    text.innerText = "Weak (Try adding numbers or symbols)";
+                    text.className = "text-xs mt-1 font-medium text-red-500";
+                } else if (score === 2) {
+                    bar.style.width = "50%";
+                    bar.className = "h-full bg-orange-400 transition-all duration-300";
+                    text.innerText = "Medium (Could be stronger)";
+                    text.className = "text-xs mt-1 font-medium text-orange-500";
+                } else if (score === 3) {
+                    bar.style.width = "75%";
+                    bar.className = "h-full bg-yellow-500 transition-all duration-300";
+                    text.innerText = "Strong password";
+                    text.className = "text-xs mt-1 font-medium text-yellow-600";
+                } else if (score === 4) {
+                    bar.style.width = "100%";
+                    bar.className = "h-full bg-teal-500 transition-all duration-300";
+                    text.innerText = "Excellent password!";
+                    text.className = "text-xs mt-1 font-medium text-teal-600";
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
