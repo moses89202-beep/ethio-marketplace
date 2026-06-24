@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat with Seller{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto my-6 px-2 sm:px-4">
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col h-[600px]">
+        
+        <div class="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-teal-500 text-white font-bold flex items-center justify-center uppercase shadow-sm">
+                    C
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-gray-900 tracking-tight">Conversation Thread</h1>
+                    <p class="text-xs text-gray-400 font-medium">Live Market Messaging</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="chat-messages-box" class="flex-grow overflow-y-auto p-4 sm:p-6 bg-slate-50/50 space-y-4 flex flex-col">
+            {% for message in conversation.messages.all %}
+                {% if message.created_by == request.user %}
+                    <div class="flex flex-col items-end max-w-[85%] sm:max-w-[75%] self-end group">
+                        <div class="bg-teal-500 text-white px-4 py-2.5 rounded-2xl rounded-tr-none shadow-sm text-sm leading-relaxed">
+                            {{ message.content }}
+                        </div>
+                        <span class="text-[10px] text-gray-400 font-medium mt-1 mx-1">
+                            You &bull; {{ message.created_at|date:"g:i A" }}
+                        </span>
+                    </div>
+                {% else %}
+                    <div class="flex flex-col items-start max-w-[85%] sm:max-w-[75%] self-start group">
+                        <div class="bg-white border border-gray-100 text-gray-800 px-4 py-2.5 rounded-2xl rounded-tl-none shadow-sm text-sm leading-relaxed">
+                            {{ message.content }}
+                        </div>
+                        <span class="text-[10px] text-gray-400 font-medium mt-1 mx-1">
+                            @{{ message.created_by.username }} &bull; {{ message.created_at|date:"g:i A" }}
+                        </span>
+                    </div>
+                {% endif %}
+            {% empty %}
+                <div class="my-auto text-center py-12 text-gray-400 text-sm">
+                    <p class="font-medium">No active communications yet.</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Send a greeting message down below to kickstart negotiations!</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="bg-white border-t border-gray-100 p-4">
+            <form action="." method="post" class="flex items-center gap-2 relative">
+                {% csrf_token %}
+
+                <div class="django-form-chat-wrapper flex-grow">
+                    {{ form.as_p }}
+                </div>
+
+                <button type="submit" class="p-3 bg-teal-500 hover:bg-teal-600 active:bg-teal-700 text-white rounded-xl transition-all duration-150 flex items-center justify-center shadow-md shadow-teal-100 self-end mb-[1px]" title="Send Message">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const chatBox = document.getElementById('chat-messages-box');
+        if (chatBox) {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    });
+</script>
+
+<style>
+
+    .django-form-chat-wrapper p {
+        margin: 0 !important;
+        display: block;
+        width: 100%;
+    }
+    
+
+    .django-form-chat-wrapper label {
+        display: none !important;
+    }
+
+    .django-form-chat-wrapper input,
+    .django-form-chat-wrapper textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        background-color: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        outline: none;
+        max-height: 46px; 
+        transition: all 0.2s ease-in-out;
+    }
+
+    .django-form-chat-wrapper input:focus,
+    .django-form-chat-wrapper textarea:focus {
+        background-color: #ffffff;
+        border-color: #14b8a6;
+        box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.1);
+    }
+</style>
+{% endblock %}
