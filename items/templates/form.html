@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="w-1/2 p-6 my-6 mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm">
+    <h1 class="mb-8 text-3xl font-bold text-gray-800 text-center">{{ title }}</h1>
+    
+    <form method="post" action="." enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if form.errors or form.non_field_errors %}
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+                {% for field in form %}
+                    {% if field.errors %}
+                        <p class="font-semibold">{{ field.label }}:</p>
+                        {{ field.errors }}
+                    {% endif %}
+                {% endfor %}
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="django-form-wrapper space-y-5 mb-6">
+            {{ form.as_p }}
+        </div>
+        
+        <button class="w-full py-4 px-8 text-lg font-semibold bg-teal-500 hover:bg-teal-600 active:bg-teal-700 rounded-xl text-white transition-colors duration-200 shadow-md shadow-teal-100 mt-2">
+            Submit
+        </button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const priceInput = document.querySelector('input[type="number"]');
+        if (priceInput) {
+            priceInput.setAttribute('min', '0');
+            priceInput.addEventListener('keydown', function(e) {
+                if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) {
+            const container = fileInput.closest('p');
+            if (container && container.innerHTML.includes('Currently:')) {
+                const currentLink = container.querySelector('a')?.getAttribute('href') || '#';
+                const currentName = container.querySelector('a')?.textContent || 'Current Image';
+
+                container.innerHTML = `
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Picture</label>
+                    <div class="file-edit-box">
+                        <div class="text-xs text-gray-500 bg-gray-50 border border-gray-200 p-3 rounded-xl mb-3 truncate">
+                            Current file: <a href="${currentLink}" target="_blank" class="text-teal-600 font-semibold hover:underline">${currentName}</a>
+                        </div>
+                        <input type="file" name="${fileInput.name}" id="${fileInput.id}">
+                    </div>
+                `;
+            }
+        }
+    });
+</script>
+
+<style>
+    .django-form-wrapper p {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1.25rem;
+    }
+
+    .django-form-wrapper label {
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .django-form-wrapper input[type="text"],
+    .django-form-wrapper input[type="number"],
+    .django-form-wrapper select,
+    .django-form-wrapper textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        background-color: #f9fafb;
+        border: 1px solid #d1d5db;
+        border-radius: 0.75rem;
+        outline: none;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .django-form-wrapper textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .django-form-wrapper input:focus,
+    .django-form-wrapper select:focus,
+    .django-form-wrapper textarea:focus {
+        background-color: #ffffff;
+        border-color: #14b8a6;
+        box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.15);
+    }
+
+    .django-form-wrapper p:has(input[type="checkbox"]):not(:has(input[type="file"])) {
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 0.75rem;
+        background-color: #f3f4f6;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        margin-top: 1.5rem;
+    }
+
+    .django-form-wrapper input[type="checkbox"] {
+        width: 1.25rem;
+        height: 1.25rem;
+        accent-color: #14b8a6;
+        cursor: pointer;
+    }
+
+    .django-form-wrapper p:has(input[type="checkbox"]):not(:has(input[type="file"])) label {
+        margin-bottom: 0;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .file-edit-box {
+        background-color: #f9fafb;
+        border: 1px dashed #d1d5db;
+        border-radius: 0.75rem;
+        padding: 1rem;
+    }
+
+    .django-form-wrapper input[type="file"] {
+        font-size: 0.875rem;
+        color: #4b5563;
+        padding: 0.25rem 0;
+    }
+    ::file-selector-button {
+        background-color: #e5e7eb;
+        color: #374151;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        margin-right: 1rem;
+        transition: background-color 0.2s;
+    }
+    ::file-selector-button:hover {
+        background-color: #d1d5db;
+    }
+</style>
+{% endblock %}
