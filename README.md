@@ -2,44 +2,44 @@
   <summary><b>🛍️ Ethiomarketplace Interface & Visual Walkthrough</b></summary>
   <br>
 
-  <!-- 1. IMAGE GRID UP TOP (4x2 Layout) -->
-  <table width="100%">
+  <!-- 1. OPTIMIZED IMAGE GRID (Crisp sizing layout) -->
+  <table width="100%" cellspacing="10" cellpadding="0" border="0">
     <!-- Row 1 -->
     <tr>
       <td align="center" valign="bottom" width="25%">
-        <img src="https://i.ibb.co/33zJChF/landing.jpg" alt="Landing Page" width="100%" style="border-radius: 6px;"/>
-        <br><sub><b>Landing Page</b></sub>
+        <img src="https://i.ibb.co/33zJChF/landing.jpg" alt="Landing Page" width="160" style="max-width: 100%; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+        <br><br><sub><b>Landing Page</b></sub>
       </td>
       <td align="center" valign="bottom" width="25%">
-        <img src="https://i.ibb.co/sJm6SH0s/browse.png" alt="Browse Marketplace" width="100%" style="border-radius: 6px;"/>
-        <br><sub><b>Browse Items</b></sub>
+        <img src="https://i.ibb.co/sJm6SH0s/browse.png" alt="Browse Marketplace" width="160" style="max-width: 100%; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+        <br><br><sub><b>Browse Items</b></sub>
       </td>
       <td align="center" valign="bottom" width="25%">
-        <img src="https://i.ibb.co/vvwpbcLS/chat.png" alt="Chat Interface" width="100%" style="border-radius: 6px;"/>
-        <br><sub><b>Buyer-Seller Chat</b></sub>
+        <img src="https://i.ibb.co/vvwpbcLS/chat.png" alt="Chat Interface" width="160" style="max-width: 100%; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+        <br><br><sub><b>Buyer-Seller Chat</b></sub>
       </td>
       <td align="center" valign="bottom" width="25%">
-        <img src="https://i.ibb.co/XrndFhTc/detail.png" alt="Product Detail" width="100%" style="border-radius: 6px;"/>
-        <br><sub><b>Product Details</b></sub>
+        <img src="https://i.ibb.co/XrndFhTc/detail.png" alt="Product Detail" width="160" style="max-width: 100%; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+        <br><br><sub><b>Product Details</b></sub>
       </td>
     </tr>
     <!-- Row 2 -->
     <tr>
       <td align="center" valign="bottom" width="25%">
-        <img src="https://i.ibb.co/vCt4pQYn/merchant-detail.png" alt="Merchant Detail" width="100%" style="border-radius: 6px;"/>
-        <br><sub><b>Merchant Profile</b></sub>
+        <img src="https://i.ibb.co/vCt4pQYn/merchant-detail.png" alt="Merchant Detail" width="160" style="max-width: 100%; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+        <br><br><sub><b>Merchant Profile</b></sub>
       </td>
       <td align="center" valign="bottom" width="25%">
-        <img src="https://i.ibb.co/b53qtV6R/add-edit-form.jpg" alt="Add/Edit Listing" width="100%" style="border-radius: 6px;"/>
-        <br><sub><b>Listing Management</b></sub>
+        <img src="https://i.ibb.co/b53qtV6R/add-edit-form.jpg" alt="Add/Edit Listing" width="160" style="max-width: 100%; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+        <br><br><sub><b>Listing Management</b></sub>
       </td>
       <td align="center" valign="bottom" width="25%">
-        <img src="https://i.ibb.co/tw5ZrVG5/login.png" alt="Login" width="100%" style="border-radius: 6px;"/>
-        <br><sub><b>User Login</b></sub>
+        <img src="https://i.ibb.co/tw5ZrVG5/login.png" alt="Login" width="160" style="max-width: 100%; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+        <br><br><sub><b>User Login</b></sub>
       </td>
       <td align="center" valign="bottom" width="25%">
-        <img src="https://i.ibb.co/RpVXKSS2/signup.png" alt="Signup" width="100%" style="border-radius: 6px;"/>
-        <br><sub><b>Account Signup</b></sub>
+        <img src="https://i.ibb.co/RpVXKSS2/signup.png" alt="Signup" width="160" style="max-width: 100%; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+        <br><br><sub><b>Account Signup</b></sub>
       </td>
     </tr>
   </table>
