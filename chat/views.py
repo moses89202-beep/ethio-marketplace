@@ -2,7 +2,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required 
 from .models import *
 from .forms import *
-# Create your views here.
+from django.http import JsonResponse
+from django.core.cache import cache
 
 @login_required
 def new_conversation(request, item_pk):
@@ -49,9 +50,22 @@ def inbox(request):
     })
 
 
+
 @login_required
 def detail(request, pk):
     conversation = Conversation.objects.filter(members__in=[request.user.id]).get(pk=pk)
+
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    user_is_typing = request.headers.get('X-Is-Typing') == 'true'
+    cache_key = f"typing_{conversation.id}_{request.user.id}"
+    
+    if user_is_typing:
+        cache.set(cache_key, True, timeout=3)
+    elif request.headers.get('X-Is-Typing') == 'false':
+        cache.delete(cache_key)
+
+    other_members = conversation.members.exclude(id=request.user.id)
+    other_is_typing = any(cache.get(f"typing_{conversation.id}_{member.id}") for member in other_members)
 
     if request.method == 'POST':
         form = ConversationMessageForm(request.POST)
@@ -61,15 +75,22 @@ def detail(request, pk):
             conversation_message.conversation = conversation
             conversation_message.created_by = request.user
             conversation_message.save()
-
             conversation.save()
 
+            cache.delete(cache_key)
+
+            if is_ajax:
+                return JsonResponse({'status': 'ok'})
             return redirect('chat:detail', pk=pk)
 
     else:
         form = ConversationMessageForm()
 
-    return render(request, 'chat/detail.html', {
+    response = render(request, 'chat/detail.html', {
         'conversation': conversation,
-        'form': form
+        'form': form,
+        'other_is_typing': other_is_typing
     })
+
+    response['X-Receiver-Typing'] = 'true' if other_is_typing else 'false'
+    return response
