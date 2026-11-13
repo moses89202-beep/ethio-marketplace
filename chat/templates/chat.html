@@ -1,0 +1,504 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+{# Phones: edge-to-edge app screen. >=640px: rounded card inside the normal page padding. #}
+<div class="-mx-4 -my-6 sm:mx-0 sm:my-0">
+<div id="chat-app" data-view="list" class="chat-shell mx-auto w-full max-w-6xl bg-white overflow-hidden flex sm:rounded-3xl sm:border sm:border-gray-100 sm:shadow-xl">
+
+    <!-- ============ Conversation list ============ -->
+    <aside id="list-pane" class="w-full md:w-80 lg:w-96 shrink-0 md:border-r border-gray-100 flex flex-col min-h-0 min-w-0">
+        <div class="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-gray-100">
+            <h1 class="text-lg font-bold tracking-tight text-gray-900">Messages</h1>
+            <p class="text-xs text-gray-400 mt-0.5 truncate">Chat with buyers and sellers</p>
+        </div>
+        <div id="conv-list" class="flex-grow overflow-y-auto p-2.5 sm:p-3 space-y-2 chat-scroll min-h-0"></div>
+    </aside>
+
+    <!-- ============ Thread ============ -->
+    <section id="thread-pane" class="flex-grow min-w-0 flex flex-col min-h-0">
+
+        <!-- nothing selected (desktop / tablet only) -->
+        <div id="thread-empty" class="flex-grow flex-col items-center justify-center text-center p-8 bg-gray-50/40" style="display:none">
+            <div class="w-16 h-16 bg-white border border-gray-100 rounded-full flex items-center justify-center mb-4 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-teal-500">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501c1.153-.086 2.294-.213 3.423-.379 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                </svg>
+            </div>
+            <p class="font-semibold text-gray-700">Select a conversation</p>
+            <p class="text-xs text-gray-400 mt-1 max-w-xs">Pick a chat on the left to read and reply. New messages appear here automatically.</p>
+        </div>
+
+        <div id="thread" class="flex-grow flex-col min-h-0" style="display:none">
+
+            <header class="px-2 sm:px-6 py-2.5 sm:py-3.5 border-b border-gray-100 flex items-center gap-2 sm:gap-3">
+                <button type="button" id="back-btn" class="md:hidden shrink-0 w-11 h-11 flex items-center justify-center text-gray-500 active:bg-gray-100 rounded-xl" aria-label="Back to messages">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                    </svg>
+                </button>
+                <div id="thread-avatar" class="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-full bg-teal-500 text-white font-bold flex items-center justify-center uppercase shadow-sm"></div>
+                <div class="min-w-0 flex-grow">
+                    <h2 id="thread-name" class="text-sm sm:text-base font-bold text-gray-900 tracking-tight truncate"></h2>
+                    <p class="text-xs text-gray-400 font-medium truncate">
+                        <span id="thread-prefix"></span><a id="thread-item" class="text-teal-600 hover:underline" href="#"></a><span id="thread-price" class="text-gray-500"></span>
+                    </p>
+                </div>
+            </header>
+
+            <div id="conn-banner" class="px-4 py-1.5 bg-amber-50 border-b border-amber-100 text-xs text-amber-700 text-center" style="display:none">
+                Connection lost &mdash; retrying&hellip;
+            </div>
+
+            <div id="messages-box" class="flex-grow overflow-y-auto p-3 sm:p-6 bg-gray-50/40 flex flex-col chat-scroll min-h-0">
+                <div id="hint" class="my-auto text-center py-8 sm:py-10 px-2" style="display:none">
+                    <div class="w-12 h-12 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501c1.153-.086 2.294-.213 3.423-.379 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                        </svg>
+                    </div>
+                    <p id="hint-title" class="text-sm font-bold text-gray-900 break-words"></p>
+                    <p id="hint-text" class="text-xs text-gray-400 mt-1 max-w-xs mx-auto break-words"></p>
+                </div>
+
+                <div id="messages" class="space-y-3 sm:space-y-4 flex flex-col"></div>
+
+                <div id="typing" class="mt-3 sm:mt-4 flex-col items-start self-start" style="display:none">
+                    <div class="bg-white border border-gray-100/80 px-4 py-3 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1.5">
+                        <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
+                    </div>
+                    <span id="typing-label" class="text-[10px] text-gray-400 font-medium mt-1.5 mx-1"></span>
+                </div>
+            </div>
+
+            <div class="composer-bar bg-white border-t border-gray-100 px-3 sm:px-5 pt-2.5 sm:pt-3">
+                <p id="send-error" class="text-xs text-red-500 mb-2 px-1" style="display:none">Couldn&rsquo;t send your message. Please try again.</p>
+                <form id="chat-form" class="flex items-end gap-2 sm:gap-3" autocomplete="off">
+                    {# text-base on phones stops iOS Safari zooming the page when the box is focused #}
+                    <textarea id="composer" rows="1" placeholder="Type your message..." enterkeyhint="send"
+                        class="flex-grow min-w-0 resize-none rounded-3xl bg-slate-100 border-[1.5px] border-transparent px-4 sm:px-5 py-2.5 sm:py-3 text-base sm:text-sm leading-6 text-slate-800 placeholder-slate-400 outline-none transition focus:bg-white focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+                        style="max-height:120px"></textarea>
+                    <button type="submit" id="send-btn" class="w-11 h-11 sm:w-12 sm:h-12 bg-teal-500 hover:bg-teal-600 active:scale-95 text-white rounded-full transition flex items-center justify-center shadow-lg shadow-teal-500/25 shrink-0" aria-label="Send">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                            <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+</div>
+
+{{ boot|json_script:"chat-boot" }}
+
+<style>
+    .chat-shell {
+        height: calc(100vh - 4.25rem);
+        height: calc(100dvh - 4.25rem);
+        min-height: 360px;
+    }
+    @media (min-width: 640px) {
+        .chat-shell {
+            height: calc(100vh - 9rem);
+            height: calc(100dvh - 9rem);
+            min-height: 480px;
+            max-height: 820px;
+        }
+    }
+    @media (min-width: 640px) and (max-height: 520px) {
+        .chat-shell {
+            height: calc(100vh - 4.25rem);
+            height: calc(100dvh - 4.25rem);
+            min-height: 300px;
+            max-height: none;
+        }
+    }
+
+    @media (max-width: 767px) {
+        #chat-app[data-view="list"] #thread-pane { display: none; }
+        #chat-app[data-view="thread"] #list-pane { display: none; }
+    }
+    .composer-bar { padding-bottom: calc(0.625rem + env(safe-area-inset-bottom, 0px)); }
+    #chat-app button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    .chat-scroll { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+    .chat-scroll::-webkit-scrollbar { width: 5px; }
+    .chat-scroll::-webkit-scrollbar-track { background: transparent; }
+    .chat-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .chat-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    .typing-dot {
+        width: 8px; height: 8px; border-radius: 9999px; background: #9ca3af;
+        display: inline-block; animation: typing-bounce 1.4s infinite both;
+    }
+    .typing-dot:nth-child(2) { animation-delay: .15s; }
+    .typing-dot:nth-child(3) { animation-delay: .3s; }
+    @keyframes typing-bounce {
+        0%, 80%, 100% { transform: scale(.4); opacity: .5; }
+        40% { transform: scale(1); opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .typing-dot { animation: none; opacity: .7; }
+    }
+</style>
+
+<script>
+(function () {
+    const boot = JSON.parse(document.getElementById('chat-boot').textContent);
+    const CSRF = "{{ csrf_token }}";
+    const BASE = boot.base;                 
+    const POLL_MS = 2000;                   
+    const POLL_MS_HIDDEN = 8000;            
+    const BASE_TITLE = document.title;
+
+    const $ = id => document.getElementById(id);
+    const app = $('chat-app'), listEl = $('conv-list');
+    const threadEl = $('thread'), threadEmpty = $('thread-empty');
+    const msgBox = $('messages-box'), msgList = $('messages');
+    const typingEl = $('typing'), banner = $('conn-banner');
+    const form = $('chat-form'), input = $('composer'), sendError = $('send-error');
+
+    let conversations = boot.conversations;
+    let activeId = boot.activeId;          
+    let newItem = boot.newItem;            
+    let lastId = 0;                     
+    let threadLoaded = false;
+    let isTyping = false, typingTimer = null;
+    let sending = false;
+
+    const SEEN_KEY = 'chat_seen_' + boot.userId;
+    let seen = {};
+    try {
+        const raw = localStorage.getItem(SEEN_KEY);
+        if (raw) seen = JSON.parse(raw) || {};
+        else {   // first visit on this browser: treat what's already there as read
+            conversations.forEach(c => { seen[c.id] = c.last_id; });
+            localStorage.setItem(SEEN_KEY, JSON.stringify(seen));
+        }
+    } catch (e) {}
+
+    function markSeen(id, msgId) {
+        if (!id || msgId <= (seen[id] || 0)) return;
+        seen[id] = msgId;
+        try { localStorage.setItem(SEEN_KEY, JSON.stringify(seen)); } catch (e) {}
+    }
+    const isUnread = c => !c.last_from_me && c.last_id > (seen[c.id] || 0);
+
+    function el(tag, cls, text) {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text !== undefined) n.textContent = text;
+        return n;
+    }
+    function show(node, on, display) { node.style.display = on ? (display || 'flex') : 'none'; }
+    const currentConv = () => conversations.find(c => c.id === activeId) || null;
+    const isDesktop = () => window.matchMedia('(min-width: 768px)').matches;
+    let listSig = '';
+    function renderList() {
+        const sig = conversations.map(c =>
+            [c.id, c.last_id, c.when, c.preview, isUnread(c), c.id === activeId].join('|')).join('~');
+        if (sig === listSig) return;
+        listSig = sig;
+
+        const unreadTotal = conversations.filter(isUnread).length;
+        document.title = (unreadTotal ? '(' + unreadTotal + ') ' : '') + BASE_TITLE;
+
+        listEl.textContent = '';
+        if (!conversations.length) {
+            const box = el('div', 'text-center py-12 px-4');
+            box.append(
+                el('h2', 'text-sm font-bold text-gray-900', 'No messages yet'),
+                el('p', 'text-xs text-gray-400 mt-1', "When you contact a seller or get an inquiry, it'll show up here.")
+            );
+            const a = el('a', 'inline-block mt-4 text-xs font-semibold bg-teal-500 text-white px-4 py-2 rounded-xl hover:bg-teal-600 transition-colors', 'Browse Marketplace');
+            a.href = boot.browseUrl;
+            box.append(a);
+            listEl.append(box);
+            return;
+        }
+
+        conversations.forEach(c => {
+            const unread = isUnread(c);
+            const row = el('button',
+                'w-full text-left flex items-center gap-3 p-3 sm:p-3.5 rounded-2xl border transition-all duration-150 active:scale-[.99] ' +
+                (c.id === activeId
+                    ? 'bg-teal-50 border-teal-200'
+                    : 'bg-white border-gray-100 hover:border-teal-200 hover:shadow-sm'));
+            row.type = 'button';
+            row.dataset.id = c.id;
+
+            const thumb = el('div', 'shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-gray-100 border border-gray-100 flex items-center justify-center text-gray-400 font-bold uppercase');
+            if (c.picture) {
+                const img = el('img', 'w-full h-full object-cover');
+                img.src = c.picture; img.alt = c.item;
+                thumb.append(img);
+            } else {
+                thumb.textContent = (c.item || '?').charAt(0);
+            }
+
+            const body = el('div', 'min-w-0 flex-grow');
+            const top = el('div', 'flex items-baseline justify-between gap-2');
+            top.append(
+                el('span', 'text-sm truncate text-gray-900 ' + (unread ? 'font-extrabold' : 'font-bold'), c.other),
+                el('span', 'text-[11px] shrink-0 ' + (unread ? 'text-teal-600 font-semibold' : 'text-gray-400'), c.when)
+            );
+            const itemLine = el('div', 'text-xs text-teal-600 font-medium truncate', c.item);
+            const bottom = el('div', 'flex items-center gap-2 mt-0.5');
+            bottom.append(el('span',
+                'text-xs truncate flex-grow ' + (unread ? 'text-gray-900 font-semibold' : 'text-gray-500'),
+                (c.last_from_me ? 'You: ' : '') + c.preview));
+            if (unread) bottom.append(el('span', 'shrink-0 w-2.5 h-2.5 bg-teal-500 rounded-full'));
+
+            body.append(top, itemLine, bottom);
+            row.append(thumb, body);
+            listEl.append(row);
+        });
+    }
+
+    listEl.addEventListener('click', e => {
+        const row = e.target.closest('[data-id]');
+        if (row) select(parseInt(row.dataset.id, 10));
+    });
+
+    let headSig = '';
+    function renderHeader() {
+        const conv = currentConv();
+        const open = !!(conv || newItem);
+
+        app.dataset.view = open ? 'thread' : 'list';
+        show(threadEl, open);
+        show(threadEmpty, !open);
+        if (!open) { headSig = ''; return; }
+
+        let name, item, itemUrl, price = '', prefix;
+        if (newItem) {
+            name = newItem.seller; item = newItem.name; itemUrl = newItem.url;
+            price = newItem.price ? ' \u00b7 ' + newItem.price : '';
+            prefix = 'About ';
+        } else {
+            name = conv.other; item = conv.item; itemUrl = conv.item_url;
+            prefix = 'Re: ';
+        }
+        const sig = [name, item, itemUrl, price].join('|');
+        if (sig !== headSig) {
+            headSig = sig;
+            $('thread-avatar').textContent = (name || '?').charAt(0);
+            $('thread-name').textContent = name;
+            $('thread-prefix').textContent = prefix;
+            const a = $('thread-item');
+            a.textContent = item; a.href = itemUrl;
+            $('thread-price').textContent = price;
+        }
+        const hint = $('hint');
+        if (newItem) {
+            $('hint-title').textContent = 'Say hello to ' + newItem.seller;
+            $('hint-text').textContent = 'Send your first message or offer about \u201c' + newItem.name + '\u201d to start the conversation.';
+            show(hint, true, 'block');
+        } else if (threadLoaded && lastId === 0) {
+            $('hint-title').textContent = 'No messages yet';
+            $('hint-text').textContent = 'Start the conversation below.';
+            show(hint, true, 'block');
+        } else {
+            show(hint, false);
+        }
+    }
+
+    function renderAll() { renderList(); renderHeader(); }
+
+    function buildMessage(m) {
+        const wrap = el('div', 'flex flex-col max-w-[88%] sm:max-w-[75%] message-item ' + (m.mine ? 'items-end self-end' : 'items-start self-start'));
+        wrap.dataset.id = m.id;
+        const bubble = el('div',
+            (m.mine
+                ? 'bg-teal-500 text-white rounded-tr-none shadow-md shadow-teal-500/10'
+                : 'bg-white border border-gray-100/80 text-gray-700 rounded-tl-none shadow-sm') +
+            ' px-4 py-2.5 sm:px-5 sm:py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]',
+            m.content);
+        const meta = el('span', 'text-[10px] text-gray-400 font-medium mt-1.5 mx-1',
+            (m.mine ? 'You' : '@' + m.username) + ' \u00b7 ' + m.time);
+        wrap.append(bubble, meta);
+        return wrap;
+    }
+
+    const nearBottom = () => msgBox.scrollHeight - msgBox.scrollTop <= msgBox.clientHeight + 100;
+    const scrollToBottom = () => { msgBox.scrollTop = msgBox.scrollHeight; };
+
+    function appendMessages(list) {
+        const fresh = list.filter(m => m.id > lastId);   // also protects against overlapping polls
+        if (!fresh.length) return;
+        const stick = lastId === 0 || nearBottom() || fresh.some(m => m.mine);
+        fresh.forEach(m => { msgList.append(buildMessage(m)); lastId = Math.max(lastId, m.id); });
+        if (stick) scrollToBottom();
+    }
+
+    function clearThread() {
+        msgList.textContent = '';
+        lastId = 0;
+        threadLoaded = false;
+        show(typingEl, false);
+    }
+
+    function setTyping(on) {
+        const conv = currentConv();
+        if (on && conv) $('typing-label').textContent = conv.other + ' is typing\u2026';
+        const wasShown = typingEl.style.display !== 'none';
+        show(typingEl, on);
+        if (on && !wasShown && nearBottom()) scrollToBottom();
+    }
+    function select(id, opts) {
+        const push = !opts || opts.push !== false;
+        if (id === activeId && !newItem) { app.dataset.view = 'thread'; return; }
+        activeId = id; newItem = null;
+        clearThread();
+        renderAll();
+        if (push) history.pushState({}, '', BASE + id + '/');
+        sync();
+        if (isDesktop()) input.focus();
+    }
+
+    function showList(push) {
+        activeId = null; newItem = null;
+        clearThread();
+        renderAll();
+        if (push) history.pushState({}, '', BASE);
+    }
+
+    $('back-btn').addEventListener('click', () => showList(true));
+
+    window.addEventListener('popstate', () => {
+        if (!location.pathname.startsWith(BASE)) { location.reload(); return; }
+        const rest = location.pathname.slice(BASE.length);
+        if (rest === '') showList(false);
+        else if (/^\d+\/$/.test(rest)) select(parseInt(rest, 10), { push: false });
+        else location.reload();
+    });
+    function setOnline(ok) { show(banner, !ok); }
+
+    async function sync() {
+        const reqActive = activeId;
+        const q = new URLSearchParams({ active: reqActive || 0, after: lastId, typing: isTyping ? 1 : 0 });
+        try {
+            const res = await fetch(BASE + 'sync/?' + q, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            if (res.redirected) { location.reload(); return; }
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+            setOnline(true);
+
+            if (reqActive !== activeId) return;
+
+            conversations = data.conversations;
+
+            if (reqActive) {
+                if (data.active === null) {                      // thread no longer exists / no access
+                    history.replaceState({}, '', BASE);
+                    showList(false);
+                    return;
+                }
+                threadLoaded = true;
+                appendMessages(data.messages);
+                setTyping(data.other_is_typing);
+                if (!document.hidden) markSeen(reqActive, lastId);
+            }
+            renderAll();
+        } catch (err) {
+            console.error('Sync error:', err);
+            setOnline(false);
+        }
+    }
+
+    let polling = false;
+    async function tick() {
+        if (!polling) {
+            polling = true;
+            try { await sync(); } finally { polling = false; }
+        }
+        setTimeout(tick, document.hidden ? POLL_MS_HIDDEN : POLL_MS);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) return;
+        if (activeId) markSeen(activeId, lastId);
+        renderList();
+        sync();
+    });
+
+    // ------------------------------------------------------------- composer
+    function autosize() {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+    }
+
+    input.addEventListener('input', () => {
+        autosize();
+        show(sendError, false);
+        isTyping = true;                                  // reported on the next regular sync
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => { isTyping = false; }, 2000);
+    });
+
+    input.addEventListener('focus', () => {
+        if (!isDesktop()) setTimeout(scrollToBottom, 300);   // after the on-screen keyboard animates in
+    });
+
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+            e.preventDefault();
+            form.requestSubmit();
+        }
+    });
+
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const text = input.value.trim();
+        if (!text || sending || (!activeId && !newItem)) return;
+
+        sending = true;
+        isTyping = false;
+        clearTimeout(typingTimer);
+        input.value = '';
+        autosize();
+        show(sendError, false);
+
+        const url = newItem ? BASE + 'new/' + newItem.id + '/' : BASE + activeId + '/send/';
+        const body = new FormData();
+        body.append('content', text);
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST', body,
+                headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (res.redirected) { location.reload(); return; }
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+
+            if (newItem) {
+                // First message created the conversation: move into it without a page load
+                const it = newItem;
+                conversations.unshift({
+                    id: data.id, other: it.seller, item_id: it.id, item: it.name, item_url: it.url,
+                    picture: it.picture, preview: text, last_id: 0, last_from_me: true, when: 'Now'
+                });
+                newItem = null;
+                activeId = data.id;
+                clearThread();
+                history.replaceState({}, '', BASE + data.id + '/');
+                renderAll();
+            }
+            sync();                                       // show my message right away
+        } catch (err) {
+            console.error('Send error:', err);
+            input.value = text;                           // give the text back
+            autosize();
+            show(sendError, true, 'block');
+        } finally {
+            sending = false;
+            if (isDesktop()) input.focus();
+        }
+    });
+    renderAll();
+    tick();
+})();
+</script>
+{% endblock %}

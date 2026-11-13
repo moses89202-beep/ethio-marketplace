@@ -6,6 +6,8 @@ app_name = 'chat'
 
 urlpatterns = [
     path('', inbox, name='inbox'),
-    path('<int:pk>/', detail, name='detail'),
+    path('sync/', sync, name='sync'),
     path('new/<int:item_pk>/', new_conversation, name='new'),
+    path('<int:pk>/', detail, name='detail'),
+    path('<int:pk>/send/', send, name='send'),
 ]
