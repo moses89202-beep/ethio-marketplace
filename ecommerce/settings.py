@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,6 +30,10 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/'
 # Application definition
+DEBUG = os.environ.get('DJANGO_DEBUG', '1') == '1'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-local-only')
+ALLOWED_HOSTS = ['YOURUSERNAME.pythonanywhere.com', 'localhost', '127.0.0.1']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
